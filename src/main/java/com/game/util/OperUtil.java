@@ -4,7 +4,6 @@ import com.game.CommonConstants.CommonConstants;
 import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -17,7 +16,7 @@ public class OperUtil {
 
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public static String login(String userId, String up) throws Exception {
+    public static String login(int userId, String up) throws Exception {
         JsonObject data = new JsonObject();
         data.addProperty("FuncTag", 40000015);
         data.addProperty("rc", "E52A4_" + userId);
@@ -53,6 +52,7 @@ public class OperUtil {
     public static int getUserInfo(String userId, String token) {
         int amount = 0;
         try {
+            System.out.println("");
             JsonObject data = new JsonObject();
             data.addProperty("FuncTag", 10005001);
             data.addProperty("userId", userId);
@@ -81,19 +81,63 @@ public class OperUtil {
         return amount;
     }
 
-    public static HttpURLConnection openConnection(String urlAddr, String param) throws IOException {
+    public static HttpURLConnection openConnection(String urlAddr, String param) throws Exception {
         URL url = new URL(String.format(urlAddr, param));
-        HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-        httpConn.setDoOutput(true);
-        httpConn.setDoInput(true);
-        httpConn.setUseCaches(false);
-        httpConn.setRequestMethod("GET");
+        HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
+        httpConnection.setDoOutput(true);
+        httpConnection.setDoInput(true);
+        httpConnection.setUseCaches(false);
+        httpConnection.setRequestMethod("GET");
         // 设置请求属性
-        httpConn.setRequestProperty("Content-Type", "application/octet-stream");
-        httpConn.setRequestProperty("Connection", "Keep-Alive");
-        httpConn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-        httpConn.setRequestProperty("Charset", "UTF-8");
-        httpConn.connect();
-        return httpConn;
+        httpConnection.setRequestProperty("Content-Type", "application/octet-stream");
+        httpConnection.setRequestProperty("Connection", "Keep-Alive");
+        httpConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+        httpConnection.setRequestProperty("Charset", "UTF-8");
+        httpConnection.connect();
+        return httpConnection;
+    }
+
+    public static JsonObject getGameStatus(int userId,String token) throws Exception{
+        JsonObject data = new JsonObject();
+        data.addProperty("FuncTag", 86000041);
+        data.addProperty("userId", userId);
+        data.addProperty("total", 1);
+        data.addProperty("token", token);
+
+        String para = URLEncoder.encode(data.toString(), "UTF-8");
+
+        HttpURLConnection httpConn = openConnection(CommonConstants.GAME_URL, para);
+        BufferedReader in = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
+        String line;
+        String result = "";
+        while ((line = in.readLine()) != null) {
+            result += line;
+        }
+        JsonObject json = (JsonObject) DataUtil.JSON_PARSER.parse(result);
+        return json;
+    }
+
+    public static void playGame(int gameNo,int country,int chip, int userId,String token) throws Exception{
+
+        JsonObject data = new JsonObject();
+        data.addProperty("FuncTag", 86000040);
+        data.addProperty("gameNo", gameNo);
+        data.addProperty("userId", userId);
+        data.addProperty("token", token);
+        data.addProperty("roomId", 100803678);
+        data.addProperty("country", country);
+        data.addProperty("chip", chip);
+        data.addProperty("platform", 1);
+
+        String para = URLEncoder.encode(data.toString(), "UTF-8");
+
+        HttpURLConnection httpConn = openConnection(CommonConstants.GAME_URL, para);
+        BufferedReader in = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
+        String line;
+        String result = "";
+        while ((line = in.readLine()) != null) {
+            result += line;
+        }
+//        JsonObject json = (JsonObject) DataUtil.JSON_PARSER.parse(result);
     }
 }
