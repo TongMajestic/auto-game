@@ -19,10 +19,15 @@ public class Main {
         String up = "E2UOUEU2UZUEUKUMUMIDEZUOUMUMUMUMDMUMZZ";
         String token = OperUtil.login(userId, up);
         String[] a = new String[] {"1_2","1_3","2_3"};
+        long now = System.currentTimeMillis();
+
         Random randon = new Random();
         int successCount = 0;
         int failCount = 0;
         while (true){
+            if ((System.currentTimeMillis() - now) > 2 * 60 * 60 * 1000){
+                break;
+            }
             JsonObject game = OperUtil.getGameStatus(userId,token);
             JsonObject gameInfo = game.get("gameInfo").getAsJsonObject();
             int gameStatus = gameInfo.get("gameStatus").getAsInt();
