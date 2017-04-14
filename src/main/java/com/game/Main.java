@@ -18,12 +18,10 @@ public class Main {
         int userId = 7507411;
         String up = "E2UOUEU2UZUEUKUMUMIDEZUOUMUMUMUMDMUMZZ";
         String token = OperUtil.login(userId, up);
-        int[] a = new int[] {1,2,3};
+        String[] a = new String[] {"1_2","1_3","2_3"};
         Random randon = new Random();
         int successCount = 0;
         int failCount = 0;
-        int bet1 = 0;
-        int bet2 = 0;
         while (true){
             JsonObject game = OperUtil.getGameStatus(userId,token);
             JsonObject gameInfo = game.get("gameInfo").getAsJsonObject();
@@ -34,11 +32,11 @@ public class Main {
             if(gameStatus == 0 || gameStatus == 3){
                 Thread.sleep(endTime - System.currentTimeMillis());
             }else if (gameStatus == 1){
-                bet1 = a[randon.nextInt(3)];
-                bet2 = a[randon.nextInt(3)];
-                gameMap.put(gameNo,bet1 + "_" + bet2);
-                OperUtil.playGame(gameNo, bet1,100,userId,token);
-                OperUtil.playGame(gameNo, bet2,100,userId,token);
+                String des = a[randon.nextInt(3)];
+                String[] s = des.split("_");
+                OperUtil.playGame(gameNo, Integer.valueOf(s[0]),100,userId,token);
+                OperUtil.playGame(gameNo, Integer.valueOf(s[1]),100,userId,token);
+                gameMap.put(gameNo,des);
                 Thread.sleep(endTime - System.currentTimeMillis());
                 /*if((endTime - System.currentTimeMillis()) > 2000){
                     Thread.sleep(endTime - System.currentTimeMillis() - 2000);
